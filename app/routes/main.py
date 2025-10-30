@@ -5,8 +5,10 @@ from app.models.note import Note
 bp = Blueprint('main', __name__)
 
 
+# Главная страница со списком заметок
 @bp.route('/')
 def index():
+    # Получаем параметр сортировки
     sort_by = request.args.get('sort', 'date_desc')
     
     if sort_by == 'date_asc':
@@ -20,12 +22,14 @@ def index():
     else:
         notes = Note.query.order_by(Note.created_at.desc()).all()
     
+    # Получаем список всех категорий
     categories = db.session.query(Note.category).distinct().order_by(Note.category).all()
     categories = [cat[0] for cat in categories]
     
     return render_template('index.html', notes=notes, categories=categories, current_sort=sort_by)
 
 
+# Создание новой заметки
 @bp.route('/note/create', methods=['GET', 'POST'])
 def create_note():
     if request.method == 'POST':
@@ -48,11 +52,13 @@ def create_note():
         elif len(category) > 100:
             errors.append('Ошибка: категория не может быть длиннее 100 символов')
         
+        # Если есть ошибки - показываем их
         if errors:
             for error in errors:
                 flash(error, 'error')
             return render_template('create_note.html', title=title, content=content, category=category)
         
+        # Сохраняем заметку в БД
         try:
             new_note = Note(title=title, content=content, category=category)
             db.session.add(new_note)
@@ -71,12 +77,14 @@ def create_note():
     return render_template('create_note.html')
 
 
+# Просмотр одной заметки
 @bp.route('/note/<int:note_id>')
 def view_note(note_id):
     note = Note.query.get_or_404(note_id)
     return render_template('view_note.html', note=note)
 
 
+# Редактирование заметки
 @bp.route('/note/<int:note_id>/edit', methods=['GET', 'POST'])
 def edit_note(note_id):
     note = Note.query.get_or_404(note_id)
@@ -145,6 +153,7 @@ def delete_note(note_id):
     return redirect(url_for('main.index'))
 
 
+# Фильтрация заметок по категории
 @bp.route('/category/<category_name>')
 def category(category_name):
     notes = Note.query.filter_by(category=category_name).order_by(Note.created_at.desc()).all()
@@ -154,6 +163,7 @@ def category(category_name):
     return render_template('category.html', notes=notes, category_name=category_name, all_categories=all_categories, count=len(notes))
 
 
+# Поиск заметок (работает с кириллицей через Python)
 @bp.route('/search')
 def search():
     query = request.args.get('q', '').strip()
@@ -162,6 +172,7 @@ def search():
         flash('Ошибка: поисковая фраза не может быть пустой', 'error')
         return redirect(url_for('main.index'))
     
+    # Получаем все заметки и фильтруем в Python (для поддержки кириллицы)
     all_notes = Note.query.order_by(Note.created_at.desc()).all()
     query_lower = query.lower()
     
@@ -170,6 +181,7 @@ def search():
     return render_template('search_results.html', notes=notes, query=query, count=len(notes))
 
 
+# Список всех категорий
 @bp.route('/categories')
 def categories():
     categories_query = db.session.query(Note.category, db.func.count(Note.id).label('count')).group_by(Note.category).order_by(Note.category).all()

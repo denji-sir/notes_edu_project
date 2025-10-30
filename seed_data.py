@@ -1,8 +1,10 @@
+# Скрипт для создания демо-данных (12 заметок)
 from app import create_app, db
 from app.models.note import Note
 from datetime import datetime, timedelta
 import random
 
+# Список демо-заметок
 demo_notes = [
     {
         'title': 'Список покупок',
