@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Страница не найдена{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center py-16">
+    <div class="text-9xl mb-6">🔍</div>
+    <h1 class="text-6xl font-bold text-gray-800 mb-4">404</h1>
+    <h2 class="text-3xl font-semibold text-gray-700 mb-4">Страница не найдена</h2>
+    <p class="text-xl text-gray-600 mb-8">
+        К сожалению, запрашиваемая страница не существует или была удалена.
+    </p>
+    
+    <div class="space-y-4">
+        <div class="flex justify-center space-x-4">
+            <a href="{{ url_for('main.index') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold inline-block transition">
+                🏠 На главную
+            </a>
+            <a href="{{ url_for('main.create_note') }}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold inline-block transition">
+                ➕ Создать заметку
+            </a>
+        </div>
+        
+        <button onclick="history.back()" 
+                class="text-blue-600 hover:text-blue-800 font-semibold">
+            ← Вернуться назад
+        </button>
+    </div>
+
+    <!-- Подсказки -->
+    <div class="mt-12 bg-gray-100 rounded-lg p-6 text-left">
+        <h3 class="font-semibold text-gray-800 mb-3">💡 Возможно, вы искали:</h3>
+        <ul class="space-y-2 text-gray-700">
+            <li>• <a href="{{ url_for('main.index') }}" class="text-blue-600 hover:underline">Список всех заметок</a></li>
+            <li>• <a href="{{ url_for('main.categories') }}" class="text-blue-600 hover:underline">Просмотр категорий</a></li>
+            <li>• <a href="{{ url_for('main.create_note') }}" class="text-blue-600 hover:underline">Создание новой заметки</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
