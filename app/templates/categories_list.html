@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Все категории - Мои Заметки{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Заголовок -->
+    <div class="mb-6">
+        <a href="{{ url_for('main.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold mb-2 inline-block">
+            ← Все заметки
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800">📂 Все категории</h1>
+        <p class="text-gray-600 mt-2">Всего категорий: {{ total_categories }}</p>
+    </div>
+
+    {% if categories %}
+    <!-- Сетка категорий -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for category in categories %}
+        <a href="{{ url_for('main.category', category_name=category.name) }}" 
+           class="bg-white rounded-lg shadow-md hover:shadow-xl transition p-6 group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="text-4xl">📁</div>
+                <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold text-lg">
+                    {{ category.count }}
+                </span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition">
+                {{ category.name }}
+            </h3>
+            <p class="text-gray-500 text-sm mt-2">
+                Заметок: {{ category.count }}
+            </p>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Статистика -->
+    <div class="mt-8 bg-blue-50 rounded-lg p-6">
+        <h3 class="font-semibold text-blue-900 mb-3">📊 Статистика категорий</h3>
+        <div class="space-y-2">
+            {% set total_notes = categories|sum(attribute='count') %}
+            <p class="text-blue-800">• Всего заметок: <strong>{{ total_notes }}</strong></p>
+            <p class="text-blue-800">• Категорий: <strong>{{ total_categories }}</strong></p>
+            <p class="text-blue-800">• Среднее заметок на категорию: <strong>{{ "%.1f"|format(total_notes / total_categories if total_categories > 0 else 0) }}</strong></p>
+        </div>
+    </div>
+    {% else %}
+    <!-- Сообщение если категорий нет -->
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+        <div class="text-6xl mb-4">📂</div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-2">Категорий пока нет</h2>
+        <p class="text-gray-500 mb-6">Создайте первую заметку с категорией</p>
+        <a href="{{ url_for('main.create_note') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold">
+            ➕ Создать заметку
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
