@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Мои Заметки{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Заголовок и кнопка создания -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Все заметки</h1>
+        <a href="{{ url_for('main.create_note') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
+            ➕ Создать заметку
+        </a>
+    </div>
+
+    <!-- Сортировка -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <span class="text-gray-700 font-semibold">🔄 Сортировка:</span>
+            <div class="flex flex-wrap gap-2">
+                <a href="/?sort=date_desc" class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_sort == 'date_desc' %}bg-blue-600 text-white{% else %}bg-gray-200 hover:bg-gray-300 text-gray-800{% endif %}">
+                    📅 Новые первыми
+                </a>
+                <a href="/?sort=date_asc" class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_sort == 'date_asc' %}bg-blue-600 text-white{% else %}bg-gray-200 hover:bg-gray-300 text-gray-800{% endif %}">
+                    📅 Старые первыми
+                </a>
+                <a href="/?sort=title_asc" class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_sort == 'title_asc' %}bg-blue-600 text-white{% else %}bg-gray-200 hover:bg-gray-300 text-gray-800{% endif %}">
+                    🔤 А-Я
+                </a>
+                <a href="/?sort=title_desc" class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_sort == 'title_desc' %}bg-blue-600 text-white{% else %}bg-gray-200 hover:bg-gray-300 text-gray-800{% endif %}">
+                    🔤 Я-А
+                </a>
+                <a href="/?sort=category" class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_sort == 'category' %}bg-blue-600 text-white{% else %}bg-gray-200 hover:bg-gray-300 text-gray-800{% endif %}">
+                    📂 По категории
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Поиск и фильтры -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="grid md:grid-cols-2 gap-4">
+            <!-- Поиск -->
+            <div>
+                <form action="{{ url_for('main.search') }}" method="get">
+                    <div class="flex">
+                        <input type="text" name="q" placeholder="Поиск заметок..." 
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-r-lg">
+                            🔍 Найти
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Фильтр по категории -->
+            <div>
+                {% if categories %}
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-700 font-semibold">Категории:</span>
+                    <div class="flex flex-wrap gap-2">
+                        {% for category in categories %}
+                        <a href="{{ url_for('main.category', category_name=category) }}" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-full text-sm">
+                            {{ category }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Список заметок -->
+    {% if notes %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for note in notes %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition p-6">
+            <!-- Заголовок и категория -->
+            <div class="mb-4">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">{{ note.title }}</h2>
+                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    {{ note.category }}
+                </span>
+            </div>
+
+            <!-- Превью содержимого -->
+            <p class="text-gray-600 mb-4">
+                {{ note.content[:100] }}{% if note.content|length > 100 %}...{% endif %}
+            </p>
+
+            <!-- Дата создания -->
+            <p class="text-sm text-gray-500 mb-4">
+                📅 {{ note.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </p>
+
+            <!-- Кнопки действий -->
+            <div class="flex space-x-2">
+                <a href="{{ url_for('main.view_note', note_id=note.id) }}" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded text-center text-sm">
+                    👁️ Просмотр
+                </a>
+                <a href="{{ url_for('main.edit_note', note_id=note.id) }}" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded text-center text-sm">
+                    ✏️ Изменить
+                </a>
+                <form method="post" action="{{ url_for('main.delete_note', note_id=note.id) }}" class="flex-1" onsubmit="return confirm('Удалить эту заметку?');">
+                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded text-sm">
+                        🗑️ Удалить
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Сообщение если заметок нет -->
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+        <div class="text-6xl mb-4">📝</div>
+        <h2 class="text-2xl font-bold text-gray-700 mb-2">Список заметок пуст</h2>
+        <p class="text-gray-500 mb-6">Создайте первую заметку, чтобы начать работу</p>
+        <a href="{{ url_for('main.create_note') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold">
+            ➕ Создать первую заметку
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
