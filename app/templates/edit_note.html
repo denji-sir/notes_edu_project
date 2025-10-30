@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать: {{ note.title }} - Мои Заметки{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Заголовок -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">✏️ Редактировать заметку</h1>
+        <p class="text-gray-600 mt-2">ID заметки: {{ note.id }} | Создана: {{ note.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+    </div>
+
+    <!-- Форма редактирования -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <form method="POST" action="{{ url_for('main.edit_note', note_id=note.id) }}">
+            <!-- Заголовок заметки -->
+            <div class="mb-6">
+                <label for="title" class="block text-gray-700 font-semibold mb-2">
+                    Заголовок заметки <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       id="title" 
+                       name="title" 
+                       value="{{ title if title is defined else note.title }}"
+                       maxlength="200"
+                       placeholder="Введите заголовок заметки..."
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       required>
+                <p class="text-sm text-gray-500 mt-1">Максимум 200 символов</p>
+            </div>
+
+            <!-- Содержимое заметки -->
+            <div class="mb-6">
+                <label for="content" class="block text-gray-700 font-semibold mb-2">
+                    Содержимое заметки <span class="text-red-500">*</span>
+                </label>
+                <textarea id="content" 
+                          name="content" 
+                          rows="10"
+                          placeholder="Введите текст заметки..."
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          required>{{ content if content is defined else note.content }}</textarea>
+                <p class="text-sm text-gray-500 mt-1">Подробно опишите вашу заметку</p>
+            </div>
+
+            <!-- Категория -->
+            <div class="mb-6">
+                <label for="category" class="block text-gray-700 font-semibold mb-2">
+                    Категория <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       id="category" 
+                       name="category" 
+                       value="{{ category if category is defined else note.category }}"
+                       maxlength="100"
+                       placeholder="Например: Работа, Личное, Идеи..."
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       required>
+                <p class="text-sm text-gray-500 mt-1">Максимум 100 символов</p>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="flex space-x-4">
+                <button type="submit" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold shadow-md transition">
+                    💾 Сохранить изменения
+                </button>
+                <a href="{{ url_for('main.view_note', note_id=note.id) }}" 
+                   class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-lg font-semibold text-center shadow-md transition">
+                    ❌ Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Предупреждение -->
+    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+        <p class="text-yellow-800">
+            <strong>⚠️ Внимание:</strong> Изменения будут сохранены после нажатия кнопки "Сохранить изменения".
+        </p>
+    </div>
+</div>
+{% endblock %}
